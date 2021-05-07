@@ -3,6 +3,7 @@
 </script>
 <center>
 	<small>
+		<br>
 		<a href="https://ergoplatform.org" title="ergoplatform.org" class="text-secondary">
 			<img src="Ergo-miniatura.png" title="ergoplatform.org" width="25" class="my-2 mx-2" alt="Logotype Ergo">ergoplatform.org
 		</a>

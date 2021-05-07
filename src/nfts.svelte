@@ -1,7 +1,5 @@
 <script>
 
-import AudioPlayer, { stopAll } from './AudioPlayer.svelte';
-
 	let valorWallet = ' '
 	let claseGuardarLocalstorage = ''
 	const onFocus = () => valorWallet = '';
@@ -71,6 +69,7 @@ import AudioPlayer, { stopAll } from './AudioPlayer.svelte';
 	}
 
 	const listados = async() => {
+
 		arrayDatos = []
 		try {
 			const res = await fetch(`https://api.ergoplatform.com/api/v0/addresses/${valorWallet}`)
@@ -79,6 +78,7 @@ import AudioPlayer, { stopAll } from './AudioPlayer.svelte';
 				for(let i = 0; i < arrayIds.length; i++){
 					const res2 = await fetch(`https://api.ergoplatform.com/api/v0/assets/${arrayIds[i]}/issuingBox`)
 					const data2 = await res2.json()
+					
 					objeto = {
 						id: data2.map(token => token.assets[0].tokenId),
 						name: data2.map(token => token.assets[0].name),
@@ -149,94 +149,134 @@ import AudioPlayer, { stopAll } from './AudioPlayer.svelte';
 
 <!-- Cabecera -->
 <main class=" bg-dark">
-	<div class="row g-3 bg-dark px-3 py-3">
-		<div class="col-sm-3 col-md-3">
-			<a href="https://ergotokens.org" class="mb-1"><img src="ergo.png" alt="Logotype Ergo" width="100"></a>
-			<span class="mx-2"> </span>
-			<!--<button class="btn bg-dark text-secondary border border-secondary">Tokens</button>-->
-		</div>
-		<div class="col-6 col-md-6">
-			<div class="input-group mb-3 bg-dark">
-				<button on:click={listFavoritePicture} title="List of favorites" class="input-group-text dropdown" id="basic-addon1"><i class="bi bi-heart-fill"></i></button>
-				<button on:click={cleanLocalStorage} title="Clean localstorage" class="input-group-text dropdown {claseGuardarLocalstorage}" id="basic-addon1"><i class="bi bi-door-open-fill"></i></button>
-				<input on:focus={onFocus} bind:value={valorWallet} class="form-control " placeholder="Your wallet"  aria-label="Your wallet" aria-describedby="basic-addon1">
-				<button on:click={guardarLocalstorage} title="Add wallet" class="input-group-text dropdown {claseGuardarLocalstorage}" id="basic-addon1"><i class="bi bi-wallet-fill"></i></button>
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+		<a href="https://ergonfts.org" class="mb-1 mx-3 separaI"><img src="ergo.png" alt="Logotype Ergo" width="100"></a>
+
+		<button class="navbar-toggler mx-3" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+			
+		<div class="collapse navbar-collapse interiorT" id="navbar">
+			<a href="https://ergotokens.org" title="Ergo Tokens" class="anchoT btn bg-dark text-secondary border border-secondary mx-2">Tokens</a>
+			<div class="input-group bg-dark">
+				<button on:click={listFavoritePicture} title="List of favorites" class="input-group-text dropdown border border-dark bg-light text-info" id="basic-addon1"><i class="bi bi-heart-fill"></i></button>
+				<button on:click={cleanLocalStorage} title="Clean localstorage" class="input-group-text dropdown border border-dark bg-light {claseGuardarLocalstorage}" id="basic-addon1"><i class="bi bi-door-open-fill"></i></button>
+				<input on:focus={onFocus} bind:value={valorWallet} class="form-control border border-dark" placeholder="Your wallet"  aria-label="Your wallet" aria-describedby="basic-addon1">
+				<button on:click={guardarLocalstorage} title="Add wallet" class="input-group-text dropdown border border-dark bg-light {claseGuardarLocalstorage}" id="basic-addon1"><i class="bi bi-wallet-fill"></i></button>
 			</div>
+			
+			<button on:click={listados} class="anchoT btn border-secondary border-seconda text-light mx-2 my-2 " title="Accept">Accept</button>
+
+			<!-- Wallet -->
+			<select bind:value={selected} class="nav-link bg-dark border border-secondary text-light mx-2 rounded">
+				<option value=0 class="dropdown-item" selected>Your Wallets</option>
+				{#each arrayWallets as wallet}
+					<option value={wallet.address} class="dropdown-item form">{wallet.address.substring(0, 7)}...{wallet.address.slice(-7)}</option>
+				{/each}
+			</select>
+
 		</div>
-		<div class="col-3 col-md-3">
-			<div>
-				<button on:click={listados} class="btn bg-dark text-light border border-secondary ml-2">Accept</button>
-				<select bind:value={selected} class="btn btn-secondary bg-dark">
-					<option value=0 class="dropdown-item" selected>Select wallet</option>
-					{#each arrayWallets as wallet}
-						<option value={wallet.address} class="dropdown-item">{wallet.address.substring(0, 7)}...{wallet.address.slice(-7)}</option>
-					{/each}
-				</select>
-			</div>
-		</div> 
-	</div>	
-	
-	<!-- Audio -->
-	<div class="mx-2 my-2 bg-light pb-1">
-		<div class="bg-secondary py-2 px-3">
+
+	  </nav>
+
+	  	<br><br><br>
+
+	<!--  -->
+	<div class="my-2 bg-light pb-1">
+		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
 			<i class="bi bi-music-note-list"></i>
 			<span>Your Audio NFTs</span>
 		</div>
 		<div class="row mx-2 my-2">
-			{#each arrayDatos as datos}
-				{#if datos.ext == '.mp3' || datos.ext == '.ogg' || datos.ext == '.wma' || datos.ext == '.wav' || datos.ext == '.aac' || datos.ext == 'aiff'}
-					<div class="card mt-2 mx-1 cardColor" style="width: 18rem;">
-						<div>
-							{#if datos.class == true}
-								<button class="btn text-danger" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>	
-							{:else}
-								<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
-							{/if}
+			{#await listados}
+				<p class="text-secondary">Loading...</p>
+			{:then listados}
+				{#each arrayDatos as datos}
+					{#if datos.ext == '.mp3' || datos.ext == '.ogg' || datos.ext == '.wma' || datos.ext == '.wav' || datos.ext == '.aac' || datos.ext == 'aiff'}
+						<div class="card mt-2 mx-1 cardColor">
+							<div>
+								{#if datos.class == true}
+									<button class="btn text-info" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>	
+								{:else}
+									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
+								{/if}
+								{datos.name}
+							</div>
+							<audio src={datos.r9} class="card-img-top mb-3 " title={datos.name} controls></audio> 
 						</div>
-						<AudioPlayer
-							src={datos.r9}
-							title={datos.name}	
-						/>
-						<!-- <audio src={datos.r9} class="card-img-top mb-3 bg-light" title={datos.name} controls></audio> -->
-					</div>
-				{/if}
-			{/each}
+					{/if}
+				{/each}
+			{:catch error}
+				<p class="text-secondary">Something went wrong: {error.message}</p>
+			{/await}
 		</div>
-	</div> 
-	
-	<!-- Picture -->
-	<div class="mx-2 my-2 bg-light pb-1">
-		<div class="bg-secondary py-2 px-3">
+	</div>
+
+	<div class="my-2 bg-light pb-1">
+		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
 			<i class="bi bi-images"></i>
 			<span>Your Picture NFTs</span>
 		</div>
 		<div class="row mx-2 my-2">
-			{#each arrayDatos as datos}
-				{#if datos.ext == '.png' || datos.ext == '.gif' || datos.ext == '.jpg' || datos.ext == 'jpeg' || datos.ext == '.bmp' || datos.ext == '.svg' || datos.ext == '.raf' || datos.ext == '.nef'}
-					<div class="card mt-2 mx-1 cardColor" style="width: 18rem;">
-						<div>
-							{#if datos.class == true}
-								<button class="btn text-danger" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>	
-							{:else}
-								<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
-							{/if}
+			{#await listados}
+				<p class="text-secondary">Loading...</p>
+			{:then listados}
+				{#each arrayDatos as datos}
+					{#if datos.ext == '.png' || datos.ext == '.gif' || datos.ext == '.jpg' || datos.ext == 'jpeg' || datos.ext == '.bmp' || datos.ext == '.svg' || datos.ext == '.raf' || datos.ext == '.nef'}
+						<div class="card mt-2 mx-1 cardColor">
+							<div>
+								{#if datos.class == true}
+									<button class="btn text-info" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>	
+								{:else}
+									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
+								{/if}
+							</div>
+							<a href={datos.r9} target="_blank" title={datos.name}>
+								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
+							</a>
 						</div>
-						<a href={datos.r9} target="_blank" title={datos.name}>
-							<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
-						</a>
-					</div>
-				{/if}
-			{/each}
+					{/if}
+				{/each}
+			{:catch listados}
+				<p>Something went wrong: {error.message}</p>
+			{/await}
 		</div>
 	</div>
 </main>
 
 <style>
 	.cardColor{
-		background-color: rgb(190, 190, 190);
+		background-color: #cfd0d2;
 		border: 0px;
+        min-width: 18rem;
+		width: 18rem; 
+		min-width: 18rem;
 	}
 	.imageBorder{
 		border: 5px solid #ffffff;
 	}
+
+	@media only screen and (max-width: 768px) {
+		.cardColor{
+			width: 97%;
+		}	
+		
+		.anchoT {
+			width: 97%;
+			margin-bottom: 10px;
+			margin-left: 0px;
+
+		}
+
+		.interiorT{
+			padding: 10px;
+		}
+
+		.separaI{
+			margin-top: 5px;;
+		}
+    
+	}
+	
+
 </style>
