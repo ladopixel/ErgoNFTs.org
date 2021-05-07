@@ -8,7 +8,7 @@
 			<img src="Ergo-miniatura.png" title="ergoplatform.org" width="25" class="my-2 mx-2" alt="Logotype Ergo">ergoplatform.org
 		</a>
 		<a href="https://github.com/ladopixel/ergonfts" title="ergotokens.org Github" class="text-secondary">
-			<img src="Github.png" title="ergotokens.org Github " width="25" class="my-2 mx-2" alt="Logotype Github">Github
+			<img src="Github.png" title="ergonfts.org Github " width="25" class="my-2 mx-2" alt="Logotype Github">Github
 		</a>
 		<button type="button" title="Donate :)" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalDonate"> <i class="bi bi-hand-thumbs-up-fill"></i></button>
 	</small>
