@@ -127,7 +127,6 @@ listados()
 </svelte:head>
 
 <main>
-<br><br><br>
     <div class="my-2 bg-light pb-1">
 		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
 			<i class="bi bi-wind"></i>
