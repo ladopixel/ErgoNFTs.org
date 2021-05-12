@@ -171,7 +171,10 @@
                     const res2 = await fetch(`https://api.ergoplatform.com/api/v0/assets/${arrayIdsTimeLine.id[i]}/issuingBox`)
                     const data2 = await res2.json()
                     let R9info = data2.map(token => token.additionalRegisters.R9)
-                    if(R9info != '' ){
+
+					linkify(arrayIdsTimeLine.desc[i])
+                    
+					if(R9info != '' ){
                         objeto = {
                             id: data2.map(token => token.assets[0].tokenId),
                             name: data2.map(token => token.assets[0].name),
@@ -206,9 +209,6 @@
 	
 var urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 function linkify(text) {
-	if (text == ''){
-		text = ' '
-	}
     return text.replace(urlRegex, function(url) {
         urlDescription = url
         return url;
