@@ -135,7 +135,7 @@
 		} catch (error) {
 			console.log(error)
 		}
-	}
+}
 
 	const cleanLocalStorage = () => {
 		localStorage.clear()
@@ -157,21 +157,20 @@
         arrayDatosTimeLine = []
         arrayIdsTimeLine = []
         try {
-            const res = await fetch(`https://api.ergoplatform.com/api/v1/tokens?limit=200`)
+            const res = await fetch(`https://api.ergoplatform.com/api/v1/tokens?limit=300`)
             const data = await res.json()
 
             objetoIdDesc = {
                     id: data.items.map(token => token.id),
-                    desc: data.items.map(token => token.description || 'No description')
+                    desc: data.items.map(token => token.description) 
                 }
 
             arrayIdsTimeLine = objetoIdDesc
-
+			console.log(arrayIdsTimeLine)
                 for(let i = 0; i < data.items.length; i++){
                     const res2 = await fetch(`https://api.ergoplatform.com/api/v0/assets/${arrayIdsTimeLine.id[i]}/issuingBox`)
                     const data2 = await res2.json()
                     let R9info = data2.map(token => token.additionalRegisters.R9)
-                    linkify(arrayIdsTimeLine.desc[i])
                     if(R9info != '' ){
                         objeto = {
                             id: data2.map(token => token.assets[0].tokenId),
@@ -180,12 +179,13 @@
                             ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
                         }
                     } else {
-                        objeto = {
-                            id: data2.map(token => token.assets[0].tokenId),
-                            name: data2.map(token => token.assets[0].name),
-                            r9: urlDescription,
-                            ext: urlDescription.slice(-4)
-                        }
+						objeto = {
+							id: data2.map(token => token.assets[0].tokenId),
+							name: data2.map(token => token.assets[0].name),
+							r9: urlDescription,
+							ext: urlDescription.slice(-4)
+						}
+
                     }
                     arrayDatosTimeLine[i] = objeto
                 }
@@ -201,9 +201,14 @@
         } catch (error) {
             console.log(error)
         }
-}
+	}
+
+	
 var urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 function linkify(text) {
+	if (text == ''){
+		text = ' '
+	}
     return text.replace(urlRegex, function(url) {
         urlDescription = url
         return url;
@@ -251,9 +256,7 @@ listadosTimeLine()
 					<option value={wallet.address} class="dropdown-item form">{wallet.address.substring(0, 7)}...{wallet.address.slice(-7)}</option>
 				{/each}
 			</select>
-
 		</div>
-
 	  </nav>
 
 	  	<br><br><br>
@@ -315,11 +318,12 @@ listadosTimeLine()
 					{/if}
 				{/each}
 			{:catch listados}
-				<p>Something went wrong: {error.message}</p>
+				<p>Error</p>
 			{/await}
 		</div>
 	</div>
 
+	
 	<div class="my-2 bg-light pb-1">
 		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
 			<i class="bi bi-wind"></i>
@@ -354,14 +358,12 @@ listadosTimeLine()
 								{/if}
                                 {datos.name}
 							</div>
-							<a href={datos.r9} target="_blank" title={datos.name}>
 								<audio src={datos.r9} class="card-img-top mb-3 " title={datos.name} controls></audio> 
-							</a>
 						</div>
 					{/if}
 				{/each}
 			{:catch listadosTimeLine}
-				<p>Something went wrong: {error.message}</p>
+				<p>Error</p>
 			{/await}
 		</div>
 	</div> 
