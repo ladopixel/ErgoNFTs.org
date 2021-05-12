@@ -171,7 +171,6 @@
                     const res2 = await fetch(`https://api.ergoplatform.com/api/v0/assets/${arrayIdsTimeLine.id[i]}/issuingBox`)
                     const data2 = await res2.json()
                     let R9info = data2.map(token => token.additionalRegisters.R9)
-
 					linkify(arrayIdsTimeLine.desc[i])
                     
 					if(R9info != '' ){
