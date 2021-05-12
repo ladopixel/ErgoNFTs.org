@@ -10,7 +10,7 @@
     let arrayFavorites = []
 	let infoFavorite = {id: '', status: ''}
 
-    const listados = async() => {
+    const listadosTimeLine = async() => {
         arrayDatos = []
         arrayIds = []
         try {

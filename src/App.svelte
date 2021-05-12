@@ -6,6 +6,6 @@
 
 <main>
 	<Nfts />
-	<LastFav />
+	<!-- <LastFav /> -->
 	<Footer />
 </main>
