@@ -8,12 +8,18 @@
 	let objeto = {}
 	let arrayDatos = []
 
+	let arrayDatosTimeLine = []
+	let arrayIdsTimeLine = []
+
 	let arrayWallets = []
 	let infoWallet = {id: '', address: ''}
 	let selected = ''
 
 	let arrayFavorites = []
 	let infoFavorite = {id: '', status: ''}
+
+	let objetoIdDesc = {}
+	let urlDescription = ''
 
 	if (localStorage.getItem("arrayWallets")){
 		arrayWallets = JSON.parse(localStorage.getItem("arrayWallets"))
@@ -46,7 +52,13 @@
 						arrayDatos[i].class = false
 					}
 				}
+				for (let i = 0; i < arrayDatosTimeLine.length; i++){
+					if (idNft[0] == arrayDatosTimeLine[i].id){
+						arrayDatosTimeLine[i].class = false
+					}
+				}
 			}
+			
 		}
 		if (isFavorite == false){
 			infoFavorite.id = idNft[0]
@@ -58,6 +70,11 @@
 					arrayDatos[i].class = true
 				}
 			}
+			for (let i = 0; i < arrayDatosTimeLine.length; i++){
+					if (idNft[0] == arrayDatosTimeLine[i].id){
+						arrayDatosTimeLine[i].class = true
+					}
+				}
 		}
 	}
 
@@ -69,7 +86,6 @@
 	}
 
 	const listados = async() => {
-
 		arrayDatos = []
 		try {
 			const res = await fetch(`https://api.ergoplatform.com/api/v0/addresses/${valorWallet}`)
@@ -115,6 +131,7 @@
 				}
 				arrayDatos[i] = objeto
 			}
+			console.log(arrayDatos)
 		} catch (error) {
 			console.log(error)
 		}
@@ -135,7 +152,65 @@
 		}
 		return str;
 	}
-	
+
+	const listadosTimeLine = async() => {
+        arrayDatosTimeLine = []
+        arrayIdsTimeLine = []
+        try {
+            const res = await fetch(`https://api.ergoplatform.com/api/v1/tokens?limit=200`)
+            const data = await res.json()
+
+            objetoIdDesc = {
+                    id: data.items.map(token => token.id),
+                    desc: data.items.map(token => token.description || 'No description')
+                }
+
+            arrayIdsTimeLine = objetoIdDesc
+
+                for(let i = 0; i < data.items.length; i++){
+                    const res2 = await fetch(`https://api.ergoplatform.com/api/v0/assets/${arrayIdsTimeLine.id[i]}/issuingBox`)
+                    const data2 = await res2.json()
+                    let R9info = data2.map(token => token.additionalRegisters.R9)
+                    linkify(arrayIdsTimeLine.desc[i])
+                    if(R9info != '' ){
+                        objeto = {
+                            id: data2.map(token => token.assets[0].tokenId),
+                            name: data2.map(token => token.assets[0].name),
+                            r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+                            ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
+                        }
+                    } else {
+                        objeto = {
+                            id: data2.map(token => token.assets[0].tokenId),
+                            name: data2.map(token => token.assets[0].name),
+                            r9: urlDescription,
+                            ext: urlDescription.slice(-4)
+                        }
+                    }
+                    arrayDatosTimeLine[i] = objeto
+                }
+                
+                for(let j = 0; j < arrayDatosTimeLine.length; j++){
+                    for (let k = 0; k < arrayFavorites.length; k++){
+                        if (arrayDatosTimeLine[j].id == arrayFavorites[k].id){
+                            arrayDatosTimeLine[j].class = true
+                        }
+                    }
+                }
+            
+        } catch (error) {
+            console.log(error)
+        }
+}
+var urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+function linkify(text) {
+    return text.replace(urlRegex, function(url) {
+        urlDescription = url
+        return url;
+    });
+}
+
+listadosTimeLine()
 </script>
 
 <svelte:head>
@@ -146,6 +221,8 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
 </svelte:head>
+
+
 
 <!-- Cabecera -->
 <main class=" bg-dark">
@@ -242,6 +319,52 @@
 			{/await}
 		</div>
 	</div>
+
+	<div class="my-2 bg-light pb-1">
+		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
+			<i class="bi bi-wind"></i>
+			<span>The last NFTs</span>
+		</div>
+		<div class="row mx-2 my-2">
+			{#await listadosTimeLine}
+				<p class="text-secondary">Loading...</p>
+			{:then listadosTimeLine}
+				{#each arrayDatosTimeLine as datos}
+					{#if datos.ext == '.png' || datos.ext == '.gif' || datos.ext == '.jpg' || datos.ext == 'jpeg' || datos.ext == '.bmp' || datos.ext == '.svg' || datos.ext == '.raf' || datos.ext == '.nef'}
+						<div class="card mt-2 mx-1 cardColor">
+							<div>
+								{#if datos.class == true}
+									<button class="btn text-info" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>	
+								{:else}
+									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
+								{/if}
+							</div>
+							<a href={datos.r9} target="_blank" title={datos.name}>
+								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
+							</a>
+						</div>
+					{/if}
+                    {#if datos.ext == '.mp3' || datos.ext == '.ogg' || datos.ext == '.wma' || datos.ext == '.wav' || datos.ext == '.aac' || datos.ext == 'aiff'}
+						<div class="card mt-2 mx-1 cardColor">
+							<div>
+								{#if datos.class == true}
+									<button class="btn text-info" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>	
+								{:else}
+									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
+								{/if}
+                                {datos.name}
+							</div>
+							<a href={datos.r9} target="_blank" title={datos.name}>
+								<audio src={datos.r9} class="card-img-top mb-3 " title={datos.name} controls></audio> 
+							</a>
+						</div>
+					{/if}
+				{/each}
+			{:catch listadosTimeLine}
+				<p>Something went wrong: {error.message}</p>
+			{/await}
+		</div>
+	</div> 
 </main>
 
 <style>
