@@ -164,7 +164,7 @@ listados()
 					{/if}
 				{/each}
 			{:catch listados}
-				<p>Something went wrong: {error.message}</p>
+				<p>Something went wrong</p>
 			{/await}
 		</div>
 	</div>
