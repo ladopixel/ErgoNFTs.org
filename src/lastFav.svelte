@@ -14,12 +14,12 @@
         arrayDatos = []
         arrayIds = []
         try {
-            const res = await fetch(`https://api.ergoplatform.com/api/v1/tokens`)
+            const res = await fetch(`https://api.ergoplatform.com/api/v1/tokens?limit=100`)
             const data = await res.json()
 
             objetoIdDesc = {
                     id: data.items.map(token => token.id),
-                    desc: data.items.map(token => token.description)
+                    desc: data.items.map(token => token.description || 'No description')
                 }
 
             arrayIds = objetoIdDesc
@@ -29,26 +29,22 @@
                     const data2 = await res2.json()
                     let R9info = data2.map(token => token.additionalRegisters.R9)
                     linkify(arrayIds.desc[i])
-                    if(R9info == '' ){
-                        objeto = {
-                            id: data2.map(token => token.assets[0].tokenId),
-                            name: data2.map(token => token.assets[0].name),
-                            r9: urlDescription,
-                            ext: urlDescription.slice(-4)
-                        }
-                        
-                    } else {
+                    if(R9info != '' ){
                         objeto = {
                             id: data2.map(token => token.assets[0].tokenId),
                             name: data2.map(token => token.assets[0].name),
                             r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
                             ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
                         }
+                    } else {
+                        objeto = {
+                            id: data2.map(token => token.assets[0].tokenId),
+                            name: data2.map(token => token.assets[0].name),
+                            r9: urlDescription,
+                            ext: urlDescription.slice(-4)
+                        }
                     }
-                    
                     arrayDatos[i] = objeto
-                    
-                    
                 }
                 
                 for(let j = 0; j < arrayDatos.length; j++){
@@ -127,7 +123,6 @@ listados()
 </svelte:head>
 
 <main>
-<br><br><br>
     <div class="my-2 bg-light pb-1">
 		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
 			<i class="bi bi-wind"></i>
@@ -160,6 +155,7 @@ listados()
 								{:else}
 									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
 								{/if}
+                                {datos.name}
 							</div>
 							<a href={datos.r9} target="_blank" title={datos.name}>
 								<audio src={datos.r9} class="card-img-top mb-3 " title={datos.name} controls></audio> 

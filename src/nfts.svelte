@@ -69,7 +69,6 @@
 	}
 
 	const listados = async() => {
-
 		arrayDatos = []
 		try {
 			const res = await fetch(`https://api.ergoplatform.com/api/v0/addresses/${valorWallet}`)
@@ -115,6 +114,7 @@
 				}
 				arrayDatos[i] = objeto
 			}
+			console.log(arrayDatos)
 		} catch (error) {
 			console.log(error)
 		}
@@ -135,7 +135,6 @@
 		}
 		return str;
 	}
-	
 </script>
 
 <svelte:head>
@@ -146,6 +145,8 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
 </svelte:head>
+
+
 
 <!-- Cabecera -->
 <main class=" bg-dark">
