@@ -157,24 +157,26 @@
         arrayDatosTimeLine = []
         arrayIdsTimeLine = []
         try {
-            const res = await fetch(`https://api.ergoplatform.com/api/v1/tokens?limit=300`)
+            // const res = await fetch(`https://api.ergoplatform.com/api/v1/tokens`)
+			// const res = await fetch(`https://api.ergoplatform.com/api/v1/tokens?offset=439`)
+			const res = await fetch(`https://api.ergoplatform.com/api/v1/tokens?limit=300`)
             const data = await res.json()
 
             objetoIdDesc = {
                     id: data.items.map(token => token.id),
                     desc: data.items.map(token => token.description) 
                 }
+				arrayIdsTimeLine = objetoIdDesc
+				
+				// Visualizo //////////////////////////////////////////
+				///////////////////////////////////////////////////////
+				console.log(arrayIdsTimeLine)
 
-            arrayIdsTimeLine = objetoIdDesc
-			console.log(arrayIdsTimeLine)
                 for(let i = 0; i < data.items.length; i++){
                     const res2 = await fetch(`https://api.ergoplatform.com/api/v0/assets/${arrayIdsTimeLine.id[i]}/issuingBox`)
                     const data2 = await res2.json()
-                    let R9info = data2.map(token => token.additionalRegisters.R9)
-					linkify(arrayIdsTimeLine.desc[i])
-
-
-					
+                    
+					let R9info = data2.map(token => token.additionalRegisters.R9)
 					if(R9info != '' ){
                         objeto = {
                             id: data2.map(token => token.assets[0].tokenId),
@@ -183,13 +185,14 @@
                             ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
                         }
                     } else {
+						// Si R9 viene vacío paso a buscar una URL en la descripción
+						linkify(arrayIdsTimeLine.desc[i])
 						objeto = {
 							id: data2.map(token => token.assets[0].tokenId),
 							name: data2.map(token => token.assets[0].name),
 							r9: urlDescription,
 							ext: urlDescription.slice(-4)
 						}
-
                     }
                     arrayDatosTimeLine[i] = objeto
                 }
