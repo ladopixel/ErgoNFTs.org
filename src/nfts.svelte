@@ -1,4 +1,6 @@
 <script>
+import { dataset_dev } from "svelte/internal";
+
 
 	let valorWallet = ' '
 	let claseGuardarLocalstorage = ''
@@ -12,8 +14,11 @@
 	let arrayIdsTimeLine = []
 	let objetoTimeLine = {}
 
-	let offsetTokens = 1000
-	let limitTokens = 400
+	let offsetTokens = 0
+	let limitTokens = 20
+	let numTokenList = 0
+	let limitDisabled = false
+	let offsetDisabled = false
 
 	let arrayWallets = []
 	let infoWallet = {id: '', address: ''}
@@ -89,6 +94,27 @@
 		}
 	}
 
+	$: {
+		if ((numTokenList != '') && (numTokenList !=0)){
+			limitTokens = numTokenList
+			listadosTimeLine()
+		}
+
+	}
+
+	const sumaOffset = () => {
+		offsetTokens = parseInt(offsetTokens) + parseInt(limitTokens)
+		listadosTimeLine()
+	}
+	const restaOffset = () => {
+		if (parseInt(offsetTokens) - parseInt(limitTokens)<0){
+			offsetTokens = 0
+		} else {
+			offsetTokens = parseInt(offsetTokens) - parseInt(limitTokens)
+		}
+		listadosTimeLine()
+	}
+
 	const listados = async() => {
 		arrayDatos = []
 		try {
@@ -98,7 +124,6 @@
 				for(let i = 0; i < arrayIds.length; i++){
 					const res2 = await fetch(`https://api.ergoplatform.com/api/v0/assets/${arrayIds[i]}/issuingBox`)
 					const data2 = await res2.json()
-					
 					objeto = {
 						id: data2.map(token => token.assets[0].tokenId),
 						name: data2.map(token => token.assets[0].name),
@@ -106,6 +131,7 @@
 						ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 					}
 					arrayDatos[i] = objeto
+
 				}
 				for(let j = 0; j < arrayDatos.length; j++){
 					for (let k = 0; k < arrayFavorites.length; k++){
@@ -157,76 +183,71 @@
 	}
 
 	const listadosTimeLine = async() => {
+		limitDisabled = true
+		offsetDisabled = true
         arrayDatosTimeLine = []
         arrayIdsTimeLine = []
         try {
 			const res = await fetch(`https://api.ergoplatform.com/api/v1/tokens?offset=${offsetTokens}&limit=${limitTokens}`)
             const data = await res.json()
-            
-			objetoIdDesc = {
-                    id: data.items.map(token => token.id),
-                    desc: data.items.map(token => token.description) 
-                }
-			arrayIdsTimeLine = objetoIdDesc
+
+			const arrayIdsTimeLine = data.items.filter(token => token.emissionAmount <= 1)
 				
-            for(let i = 0; i < data.items.length; i++){
-                const res2 = await fetch(`https://api.ergoplatform.com/api/v0/assets/${arrayIdsTimeLine.id[i]}/issuingBox`)
+            for(let i = 0; i < arrayIdsTimeLine.length; i++){
+                const res2 = await fetch(`https://api.ergoplatform.com/api/v0/assets/${arrayIdsTimeLine[i].id}/issuingBox`)
                 const data2 = await res2.json()
-                
+
 				let R7info = data2.map(token => token.additionalRegisters.R7)
-				let R9info = data2.map(token => token.additionalRegisters.R9)
-				let R5info = data2.map(token => token.additionalRegisters.R5)
-				
-				// Es un NFTs de audio o vídeo
 				if (R7info == '0e020101' || R7info == '0e020102') {
-					// Hay R9 con enlace al nft
+					let R9info = data2.map(token => token.additionalRegisters.R9)
+					let R5info = data2.map(token => token.additionalRegisters.R5)
 					if (R9info != '') {
+						linkify(arrayIdsTimeLine[i].description)
 						objetoTimeLine = {
 							id: data2.map(token => token.assets[0].tokenId),
 							name: data2.map(token => token.assets[0].name),
-							description: data2.map(token => toUtf8String(token.additionalRegisters.R5)),
+							description: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 							r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
-							ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
+							ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
+							urlInTxt: urlDescription
 						}
-						
-						
-					// Si R9 viene vacío
 					} else if (R9info == '') {
-						// Hay texto en la descripción del nfts
-						if (arrayIdsTimeLine.desc[i] != '') {
-							linkify(arrayIdsTimeLine.desc[i])
+						if (arrayIdsTimeLine[i].description != '') {
+							linkify(arrayIdsTimeLine[i].description)
 							objetoTimeLine = {
 								id: data2.map(token => token.assets[0].tokenId),
 								name: data2.map(token => token.assets[0].name),
 								description: data2.map(token => toUtf8String(token.additionalRegisters.R5)),
 								r9: urlDescription,
-								ext: urlDescription.slice(-4)
+								ext: urlDescription.slice(-4),
+								urlInTxt: urlDescription
 							}
 						}
 					}
 				}
 				arrayDatosTimeLine[i] = objetoTimeLine
+				objetoTimeLine = {id: '', name: '', description: '', r9: '', ext: '' }
+
 			}
-			console.log(arrayDatosTimeLine)
-           
-				for(let j = 0; j < arrayDatosTimeLine.length; j++){
-                    for (let k = 0; k < arrayFavorites.length; k++){
-                        if (arrayDatosTimeLine[j].id == arrayFavorites[k].id){
-                            arrayDatosTimeLine[j].class = true
-                        }
+			for(let j = 0; j < arrayDatosTimeLine.length; j++){
+                for (let k = 0; k < arrayFavorites.length; k++){
+                      if (arrayDatosTimeLine[j].id == arrayFavorites[k].id){
+                	    arrayDatosTimeLine[j].class = true
                     }
                 }
-            
+            }
+			limitDisabled = false
+			offsetDisabled = false
+			console.log(arrayIdsTimeLine)
         } catch (error) {
             console.log(error)
         }
 	}
-
 	
 var urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 function linkify(text) {
     return text.replace(urlRegex, function(url) {
-        urlDescription = url
+		urlDescription = url
         return url;
     });
 }
@@ -342,8 +363,19 @@ listadosTimeLine()
 	
 	<div class="my-2 bg-light pb-1">
 		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
-			<i class="bi bi-wind"></i>
-			<span>The last NFTs</span>
+			
+				<i class="bi bi-wind"></i>
+				<span>The last NFTs</span>
+				
+				<!-- <select bind:value={numTokenList} disabled={limitDisabled} class="nav-link bg-secondary border border-dark text-light mx-2 rounded">
+					<option value=0>Select</option>
+					<option value=10>10</option>
+					<option value=20>20</option>
+					<option value=50>50</option>
+				</select>
+				<button on:click={restaOffset} disabled={offsetDisabled}>-</button>
+				<button on:click={sumaOffset} disabled={offsetDisabled}>+</button> -->
+				
 		</div>
 		<div class="row mx-2 my-2">
 			{#await listadosTimeLine}
@@ -362,7 +394,8 @@ listadosTimeLine()
 							<a href={datos.r9} target="_blank" title={datos.name}>
 								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
 							</a>
-							<span class="h4">{datos.name}</span><span class="small">{datos.description}</span>
+							<span class="h4">{datos.name}</span><span class="small mb-2">{datos.description}</span>
+							<a href={datos.urlInTxt} class="mb-2">{datos.urlInTxt.substring(8, 30)}...</a>
 						</div>
 					{/if}
                     {#if datos.ext == '.mp3' || datos.ext == '.ogg' || datos.ext == '.wma' || datos.ext == '.wav' || datos.ext == '.aac' || datos.ext == 'aiff'}
@@ -376,6 +409,8 @@ listadosTimeLine()
                                 {datos.name}
 							</div>
 								<audio src={datos.r9} class="card-img-top mb-3 " title={datos.name} controls></audio> 
+								<span class="h6">{datos.name}</span><span class="small mb-2">{datos.description}</span>
+								<a href={datos.urlInTxt} class="mb-2">{datos.urlInTxt.substring(8, 30)}...</a>
 						</div>
 					{/if}
 				{/each}
