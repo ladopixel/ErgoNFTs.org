@@ -351,12 +351,12 @@ listadosTimeLine()
 	<div class="my-2 bg-light pb-1">
 		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
 			
-				<div class="row justify-content-start"> 
-				  <div class="col-2">
+				
+				  
 					<i class="bi bi-wind"></i>
 					<span>The last NFTs</span>
-				  </div>
-				</div>
+				  
+				
 			
 		</div>
 		<div class="row mx-2 my-2">
