@@ -107,6 +107,9 @@
 			const res = await fetch(`https://api.ergoplatform.com/api/v0/addresses/${valorWallet}`)
 			const data = await res.json()
 			const arrayIds = data.transactions.confirmedTokensBalance.map(token => token.tokenId)
+			if (arrayIds.length <= 0){
+				alert('No tokens')
+			}
 				for(let i = 0; i < arrayIds.length; i++){
 					const res2 = await fetch(`https://api.ergoplatform.com/api/v0/assets/${arrayIds[i]}/issuingBox`)
 					const data2 = await res2.json()
@@ -256,6 +259,7 @@ function linkify(text) {
     });
 }
 
+listadosTimeLine ()
 </script>
 
 <svelte:head>
