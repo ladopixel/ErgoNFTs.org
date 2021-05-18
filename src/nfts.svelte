@@ -1,4 +1,8 @@
 <script>
+	import {parse} from 'qs'
+	import {location, querystring} from 'svelte-spa-router'
+	
+
 	let valorWallet = ' '
 	let claseGuardarLocalstorage = ''
 	const onFocus = () => valorWallet = '';
@@ -91,6 +95,12 @@
 		}
 	}
 
+	$: {
+		valorWallet = JSON.stringify($location).substr(2)
+		valorWallet = valorWallet.substring(0, valorWallet.length - 1);
+		listados()
+	}
+
 	const listados = async() => {
 		arrayDatos = []
 		try {
@@ -121,6 +131,8 @@
 			console.log(error)
 		}
 	}
+
+	
 
  const listFavoritePicture = async() => {
 	arrayDatos = []
@@ -244,7 +256,6 @@ function linkify(text) {
     });
 }
 
-listadosTimeLine()
 </script>
 
 <svelte:head>
