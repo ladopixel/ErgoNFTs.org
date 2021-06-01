@@ -1,4 +1,4 @@
-<script>
+<script >
 	import {parse} from 'qs'
 	import {location, querystring} from 'svelte-spa-router'
 	
@@ -93,12 +93,6 @@
 			valorWallet = selected
 			listados()
 		}
-	}
-
-	$: {
-		valorWallet = JSON.stringify($location).substr(2)
-		valorWallet = valorWallet.substring(0, valorWallet.length - 1);
-		listados()
 	}
 
 	const listados = async() => {
@@ -259,6 +253,12 @@ function linkify(text) {
     });
 }
 
+if (JSON.stringify($location).substr(2)){
+	valorWallet = JSON.stringify($location).substr(2)
+	valorWallet = valorWallet.substring(0, valorWallet.length - 1);
+	listados()	
+}
+
 listadosTimeLine ()
 </script>
 
@@ -362,17 +362,10 @@ listadosTimeLine ()
 		</div>
 	</div>
 
-	
 	<div class="my-2 bg-light pb-1">
 		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
-			
-				
-				  
-					<i class="bi bi-wind"></i>
-					<span>The last NFTs</span>
-				  
-				
-			
+			<i class="bi bi-wind"></i>
+			<span>The last NFTs</span>
 		</div>
 		<div class="row mx-2 my-2">
 			{#await listadosTimeLine}
@@ -391,7 +384,7 @@ listadosTimeLine ()
 							<a href={datos.r9} target="_blank" title={datos.name}>
 								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
 							</a>
-							<span class="h6">{datos.name}</span><span class="small mb-2 text-secondary">{datos.description}</span>
+							<span class="h6">{datos.name}</span><span class="small mb-2 text-secondary">{decodeURIComponent(escape(datos.description))}</span>
 							{#if (datos.urlInTxt !='')}
 								<hr class="text-secondary">
 								<span class="mb-3 text-dark"><i class="bi bi-link"></i>
@@ -410,7 +403,7 @@ listadosTimeLine ()
                                 {datos.name}
 							</div>
 								<audio src={datos.r9} class="card-img-top mb-3 " title={datos.name} controls></audio> 
-								<span class="h6">{datos.name}</span><span class="small mb-2 text-secondary">{datos.description}</span>
+								<span class="h6">{datos.name}</span><span class="small mb-2 text-secondary">{decodeURIComponent(escape(datos.description))}</span>
 								{#if (datos.urlInTxt !='')}
 									<hr class="text-secondary">
 									<span class="mb-3 text-dark"><i class="bi bi-link"></i>
