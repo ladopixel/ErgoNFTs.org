@@ -1,9 +1,9 @@
-<script>
+<script >
 	import {parse} from 'qs'
 	import {location, querystring} from 'svelte-spa-router'
 	
-
 	let valorWallet = ' '
+	let valorIdToken = ' '
 	let claseGuardarLocalstorage = ''
 	const onFocus = () => valorWallet = '';
 
@@ -95,18 +95,15 @@
 		}
 	}
 
-	$: {
-		valorWallet = JSON.stringify($location).substr(2)
-		valorWallet = valorWallet.substring(0, valorWallet.length - 1);
-		listados()
-	}
-
 	const listados = async() => {
 		arrayDatos = []
 		try {
 			const res = await fetch(`https://api.ergoplatform.com/api/v0/addresses/${valorWallet}`)
 			const data = await res.json()
 			const arrayIds = data.transactions.confirmedTokensBalance.map(token => token.tokenId)
+			if (arrayIds.length <= 0){
+				alert('No tokens')
+			}
 				for(let i = 0; i < arrayIds.length; i++){
 					const res2 = await fetch(`https://api.ergoplatform.com/api/v0/assets/${arrayIds[i]}/issuingBox`)
 					const data2 = await res2.json()
@@ -256,6 +253,25 @@ function linkify(text) {
     });
 }
 
+
+if (JSON.stringify($location).substr(2)){
+	valorWallet = JSON.stringify($location).substr(2)
+	valorWallet = valorWallet.substring(0, valorWallet.length - 1);
+	listados()
+}
+
+valorIdToken = JSON.stringify($querystring)
+if (valorIdToken.substring(1, 6) == 'token'){
+	// http://localhost:5000/#/?token=9a9cac59e2266b5e4325ba4eda8487ac8d76879dc6e5c8294e6784cb345ee7a2
+	valorIdToken = valorIdToken.substring(7, valorIdToken.length - 1);
+	//muestraTokenURL (valorIdToken)
+	alert(valorIdToken)
+}
+
+
+
+
+listadosTimeLine ()
 </script>
 
 <svelte:head>
@@ -327,6 +343,7 @@ function linkify(text) {
 		</div>
 	</div>
 
+	<!-- Imágenes -->
 	<div class="my-2 bg-light pb-1">
 		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
 			<i class="bi bi-images"></i>
@@ -339,6 +356,7 @@ function linkify(text) {
 				{#each arrayDatos as datos}
 					{#if datos.ext == '.png' || datos.ext == '.gif' || datos.ext == '.jpg' || datos.ext == 'jpeg' || datos.ext == '.bmp' || datos.ext == '.svg' || datos.ext == '.raf' || datos.ext == '.nef'}
 						<div class="card mt-2 mx-1 cardColor">
+							<a href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT%20created%20in%20@ergoplatformorg&url=https://ergonfts.org/%23/?token={datos.id}&hashtags=ErgoNFTs,NFTart,Ergo2Top10" target="_blank">Twitter</a>
 							<div>
 								{#if datos.class == true}
 									<button class="btn text-info" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>	
@@ -346,9 +364,25 @@ function linkify(text) {
 									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
 								{/if}
 							</div>
-							<a href={datos.r9} target="_blank" title={datos.name}>
+							<a href={datos.r9} title={datos.name} data-bs-toggle="modal" data-bs-target="#modalToken{datos.id}">
 								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
 							</a>
+							<!-- Modal -->
+							<div class="modal fade " id="modalToken{datos.id}" tabindex="-1" aria-labelledby="exampleModalLabelToken" aria-hidden="true">
+								<div class="modal-dialog modal-lg">
+								<div class="modal-content">
+									<div class="modal-header bg-secondary">
+									<h5 class="modal-title bg-dark text-light py-1 px-3" id="exampleModalLabelToken">ergonfts.org</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<div><span class="small"><strong>Token ID: </strong> {datos.id}</span></div>
+										<div><span class="small"><strong>Name: </strong> {datos.name}</span></div>
+										<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="100">
+									</div>
+								</div>
+								</div>
+							</div>	
 						</div>
 					{/if}
 				{/each}
@@ -358,17 +392,10 @@ function linkify(text) {
 		</div>
 	</div>
 
-	
 	<div class="my-2 bg-light pb-1">
 		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
-			
-				
-				  
-					<i class="bi bi-wind"></i>
-					<span>The last NFTs</span>
-				  
-				
-			
+			<i class="bi bi-wind"></i>
+			<span>The last NFTs</span>
 		</div>
 		<div class="row mx-2 my-2">
 			{#await listadosTimeLine}
@@ -376,7 +403,8 @@ function linkify(text) {
 			{:then listadosTimeLine}
 				{#each arrayDatosTimeLine as datos}
 					{#if datos.ext == 'ink/' || datos.ext == '.png' || datos.ext == '.gif' || datos.ext == '.jpg' || datos.ext == 'jpeg' || datos.ext == '.bmp' || datos.ext == '.svg' || datos.ext == '.raf' || datos.ext == '.nef'}
-						<div class="card mt-2 mx-1 cardColor">
+					<div class="card mt-2 mx-1 cardColor">
+						<a href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT%20created%20in%20@ergoplatformorg&url=https://ergonfts.org/%23/?token={datos.id}&hashtags=ErgoNFTs,NFTart,Ergo2Top10" target="_blank">Twitter</a>
 							<div>
 								{#if datos.class == true}
 									<button class="btn text-info" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>	
@@ -384,10 +412,26 @@ function linkify(text) {
 									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
 								{/if}
 							</div>
-							<a href={datos.r9} target="_blank" title={datos.name}>
+							<a href={datos.r9} title={datos.name} data-bs-toggle="modal" data-bs-target="#modalToken{datos.id}">
 								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
 							</a>
-							<span class="h6">{datos.name}</span><span class="small mb-2 text-secondary">{datos.description}</span>
+							<!-- Modal -->
+							<div class="modal fade " id="modalToken{datos.id}" tabindex="-1" aria-labelledby="exampleModalLabelToken" aria-hidden="true">
+								<div class="modal-dialog modal-lg">
+								<div class="modal-content">
+									<div class="modal-header bg-secondary">
+									<h5 class="modal-title bg-dark text-light py-1 px-3" id="exampleModalLabelToken">ergonfts.org</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<div><span class="small"><strong>Token ID: </strong> {datos.id}</span></div>
+										<div><span class="small"><strong>Name: </strong> {datos.name}</span></div>
+										<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="100">
+									</div>
+								</div>
+								</div>
+							</div>	
+							<span class="h6">{datos.name}</span><span class="small mb-2 text-secondary">{decodeURIComponent(escape(datos.description))}</span>
 							{#if (datos.urlInTxt !='')}
 								<hr class="text-secondary">
 								<span class="mb-3 text-dark"><i class="bi bi-link"></i>
@@ -406,7 +450,7 @@ function linkify(text) {
                                 {datos.name}
 							</div>
 								<audio src={datos.r9} class="card-img-top mb-3 " title={datos.name} controls></audio> 
-								<span class="h6">{datos.name}</span><span class="small mb-2 text-secondary">{datos.description}</span>
+								<span class="h6">{datos.name}</span><span class="small mb-2 text-secondary">{decodeURIComponent(escape(datos.description))}</span>
 								{#if (datos.urlInTxt !='')}
 									<hr class="text-secondary">
 									<span class="mb-3 text-dark"><i class="bi bi-link"></i>
@@ -425,6 +469,7 @@ function linkify(text) {
 			<span class="small">{whale}</span>
 		</div>
 	</div>
+
 </main>
 
 <style>
