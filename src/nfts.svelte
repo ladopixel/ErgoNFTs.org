@@ -4,6 +4,7 @@
 	
 	let valorWallet = ' '
 	let valorIdToken = ' '
+	let objetoTokenURL = {}
 	let claseGuardarLocalstorage = ''
 	const onFocus = () => valorWallet = '';
 
@@ -110,7 +111,9 @@
 					objeto = {
 						id: data2.map(token => token.assets[0].tokenId),
 						name: data2.map(token => token.assets[0].name),
+						ch: data2.map(token => token.creationHeight),
 						r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+						r5: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 						ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 					}
 					arrayDatos[i] = objeto
@@ -140,6 +143,7 @@
 				objeto = {
 					id: data2.map(token => token.assets[0].tokenId),
 					name: data2.map(token => token.assets[0].name),
+					ch: data2.map(token => token.creationHeight),
 					r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
 					ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 					class: true
@@ -202,7 +206,7 @@
                 const data2 = await res2.json()
 				
 				let R7info = data2.map(token => token.additionalRegisters.R7)
-				if (R7info == '0e020101' || R7info == '0e020102'){
+				if (R7info == '0e020101' || R7info == '0e020102' ){
 					let R9info = data2.map(token => token.additionalRegisters.R9)
 					let R5info = data2.map(token => token.additionalRegisters.R5)
 					if (R9info != '') {
@@ -210,6 +214,7 @@
 						objetoTimeLine = {
 							id: data2.map(token => token.assets[0].tokenId),
 							name: data2.map(token => token.assets[0].name),
+							ch: data2.map(token => token.creationHeight),
 							description: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 							r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
 							ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
@@ -260,15 +265,30 @@ if (JSON.stringify($location).substr(2)){
 	listados()
 }
 
+// Rescatar valor y mostrar token desde URL
+// http://localhost:5000/#/?token=9a9cac59e2266b5e4325ba4eda8487ac8d76879dc6e5c8294e6784cb345ee7a2
 valorIdToken = JSON.stringify($querystring)
 if (valorIdToken.substring(1, 6) == 'token'){
-	// http://localhost:5000/#/?token=9a9cac59e2266b5e4325ba4eda8487ac8d76879dc6e5c8294e6784cb345ee7a2
 	valorIdToken = valorIdToken.substring(7, valorIdToken.length - 1);
-	//muestraTokenURL (valorIdToken)
-	alert(valorIdToken)
+	muestraTokenURL (valorIdToken)
 }
 
-
+function muestraTokenURL(valorIdToken) {
+		fetch(`https://api.ergoplatform.com/api/v0/assets/${valorIdToken}/issuingBox`)
+        	.then(response => response.json())
+        	.then(consulta => {
+				objetoTokenURL = {
+					id: consulta.map(token => token.assets[0].tokenId),
+					name: consulta.map(token => token.assets[0].name),
+					txid: consulta.map(token => token.txId),
+					ch: consulta.map(token => token.creationHeight),
+					r9: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+					r5: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
+					ext: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
+				}
+				
+          })
+}
 
 
 listadosTimeLine ()
@@ -356,13 +376,14 @@ listadosTimeLine ()
 				{#each arrayDatos as datos}
 					{#if datos.ext == '.png' || datos.ext == '.gif' || datos.ext == '.jpg' || datos.ext == 'jpeg' || datos.ext == '.bmp' || datos.ext == '.svg' || datos.ext == '.raf' || datos.ext == '.nef'}
 						<div class="card mt-2 mx-1 cardColor">
-							<a href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT%20created%20in%20@ergoplatformorg&url=https://ergonfts.org/%23/?token={datos.id}&hashtags=ErgoNFTs,NFTart,Ergo2Top10" target="_blank">Twitter</a>
+							
 							<div>
 								{#if datos.class == true}
 									<button class="btn text-info" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>	
 								{:else}
 									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
 								{/if}
+								<a class="btn text-light" href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT%20created%20in%20@ergoplatformorg&url=https://ergonfts.org/%23/?token={datos.id}&hashtags=ErgoNFTs,NFTart,Ergo2Top10" target="_blank"><i class="bi bi-twitter"></i></a>
 							</div>
 							<a href={datos.r9} title={datos.name} data-bs-toggle="modal" data-bs-target="#modalToken{datos.id}">
 								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
@@ -376,6 +397,7 @@ listadosTimeLine ()
 									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 									</div>
 									<div class="modal-body">
+										<div><span class="small"><strong>Antiquity: </strong> {datos.ch}</span></div>
 										<div><span class="small"><strong>Token ID: </strong> {datos.id}</span></div>
 										<div><span class="small"><strong>Name: </strong> {datos.name}</span></div>
 										<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="100">
@@ -404,13 +426,13 @@ listadosTimeLine ()
 				{#each arrayDatosTimeLine as datos}
 					{#if datos.ext == 'ink/' || datos.ext == '.png' || datos.ext == '.gif' || datos.ext == '.jpg' || datos.ext == 'jpeg' || datos.ext == '.bmp' || datos.ext == '.svg' || datos.ext == '.raf' || datos.ext == '.nef'}
 					<div class="card mt-2 mx-1 cardColor">
-						<a href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT%20created%20in%20@ergoplatformorg&url=https://ergonfts.org/%23/?token={datos.id}&hashtags=ErgoNFTs,NFTart,Ergo2Top10" target="_blank">Twitter</a>
 							<div>
 								{#if datos.class == true}
 									<button class="btn text-info" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>	
 								{:else}
 									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
 								{/if}
+								<a class="btn text-light" href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT%20created%20in%20@ergoplatformorg&url=https://ergonfts.org/%23/?token={datos.id}&hashtags=ErgoNFTs,NFTart,Ergo2Top10" target="_blank"><i class="bi bi-twitter"></i></a>
 							</div>
 							<a href={datos.r9} title={datos.name} data-bs-toggle="modal" data-bs-target="#modalToken{datos.id}">
 								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
@@ -424,6 +446,7 @@ listadosTimeLine ()
 									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 									</div>
 									<div class="modal-body">
+										<div><span class="small"><strong>Antiquity: </strong> {datos.ch}</span></div>
 										<div><span class="small"><strong>Token ID: </strong> {datos.id}</span></div>
 										<div><span class="small"><strong>Name: </strong> {datos.name}</span></div>
 										<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="100">
@@ -470,6 +493,24 @@ listadosTimeLine ()
 		</div>
 	</div>
 
+	<!-- Modal muestraTokenURL -->
+	<button type="button" title="Donate :)" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalTokenURL"></button> 
+	<div class="modal fade " id="modalTokenURL" tabindex="-1" aria-labelledby="exampleModalLabelToken" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header bg-secondary">
+			<h5 class="modal-title bg-dark text-light py-1 px-3" id="exampleModalLabelToken">ergonfts.org</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div><span class="small"><strong>Antiquity: </strong> {objetoTokenURL.ch}</span></div>
+				<div><span class="small"><strong>Token ID: </strong> {objetoTokenURL.id}</span></div>
+				<div><span class="small"><strong>Name: </strong> {objetoTokenURL.name}</span></div>
+				<img src={objetoTokenURL.r9} class="card-img-top mb-3 imageBorder" alt={objetoTokenURL.name} width="100">
+			</div>
+		</div>
+		</div>
+	</div>
 </main>
 
 <style>

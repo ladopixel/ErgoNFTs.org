@@ -13,8 +13,6 @@
 		<button type="button" title="Donate :)" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalDonate"> <i class="bi bi-hand-thumbs-up-fill"></i></button>
 	</small>
 </center>
-
-  
  <!-- Modal -->
   <div class="modal fade " id="modalDonate" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
@@ -27,7 +25,6 @@
 			<div class="text-break pb-3">If you liked the website <strong>you can invite me to a coffee,</strong> I will be happy to drink it to your health.</div>
 			<div><span class="small"><strong>ERG address: </strong>9ggm3WB6e2BMbbCD3C9PJcgm5wbvmvCUG7w5rgszbKVWrVr8fSE</span></div>
 			<div><img src={imageDonation} alt="QR wallet address"/></div>
-
 		</div>
 	  </div>
 	</div>
