@@ -1,9 +1,10 @@
 <script >
 	import {parse} from 'qs'
 	import {location, querystring} from 'svelte-spa-router'
-	
 
 	let valorWallet = ' '
+	let valorIdToken = ' '
+	let objetoTokenURL = {}
 	let claseGuardarLocalstorage = ''
 	const onFocus = () => valorWallet = '';
 
@@ -110,7 +111,9 @@
 					objeto = {
 						id: data2.map(token => token.assets[0].tokenId),
 						name: data2.map(token => token.assets[0].name),
+						ch: data2.map(token => token.creationHeight),
 						r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+						r5: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 						ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 					}
 					arrayDatos[i] = objeto
@@ -140,6 +143,7 @@
 				objeto = {
 					id: data2.map(token => token.assets[0].tokenId),
 					name: data2.map(token => token.assets[0].name),
+					ch: data2.map(token => token.creationHeight),
 					r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
 					ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 					class: true
@@ -202,7 +206,7 @@
                 const data2 = await res2.json()
 				
 				let R7info = data2.map(token => token.additionalRegisters.R7)
-				if (R7info == '0e020101' || R7info == '0e020102'){
+				if (R7info == '0e020101' || R7info == '0e020102' ){
 					let R9info = data2.map(token => token.additionalRegisters.R9)
 					let R5info = data2.map(token => token.additionalRegisters.R5)
 					if (R9info != '') {
@@ -210,6 +214,7 @@
 						objetoTimeLine = {
 							id: data2.map(token => token.assets[0].tokenId),
 							name: data2.map(token => token.assets[0].name),
+							ch: data2.map(token => token.creationHeight),
 							description: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 							r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
 							ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
@@ -253,16 +258,41 @@ function linkify(text) {
     });
 }
 
+
 if (JSON.stringify($location).substr(2)){
 	valorWallet = JSON.stringify($location).substr(2)
 	valorWallet = valorWallet.substring(0, valorWallet.length - 1);
-	listados()	
+	listados()
 }
+
+// // Rescatar valor y mostrar token desde URL
+// valorIdToken = JSON.stringify($querystring)
+// if (valorIdToken.substring(1, 6) == 'token'){
+// 	valorIdToken = valorIdToken.substring(7, valorIdToken.length - 1);
+// 	muestraTokenURL (valorIdToken)
+// }
+
+// function muestraTokenURL(valorIdToken) {
+// 		fetch(`https://api.ergoplatform.com/api/v0/assets/${valorIdToken}/issuingBox`)
+//         	.then(response => response.json())
+//         	.then(consulta => {
+// 				objetoTokenURL = {
+// 					id: consulta.map(token => token.assets[0].tokenId),
+// 					name: consulta.map(token => token.assets[0].name),
+// 					ch: consulta.map(token => token.creationHeight),
+// 					r9: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+// 					r5: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
+// 					ext: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
+// 				}
+// 			})
+// 			.catch(error => console.error(error));
+// }
+
 
 listadosTimeLine ()
 </script>
 
-<svelte:head>
+<!-- <svelte:head>
 	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 	<script src="popper.min.js"></script>
 	<script src="bootstrap.js"></script>
@@ -270,7 +300,7 @@ listadosTimeLine ()
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
-</svelte:head>
+</svelte:head> -->
 
 <!-- Cabecera -->
 <main class=" bg-dark">
@@ -300,7 +330,30 @@ listadosTimeLine ()
 
 	  	<br><br><br>
 
-	<!--  -->
+	<!-- Modal muestraTokenURL -->
+	{#if (objetoTokenURL.id)}
+	<button id="buttonModalTokenURL" type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalTokenURL">Ver token</button> 
+	<div class="modal fade" id="modalTokenURL" tabindex="-1" aria-labelledby="exampleModalLabelToken" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header bg-secondary">
+			<h5 class="modal-title bg-dark text-light py-1 px-3" id="exampleModalLabelToken">ergonfts.org</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div><span class="small"><strong>Token ID: </strong> {objetoTokenURL.id}</span></div>
+				<div><span class="small"><strong>Name: </strong> {objetoTokenURL.name}</span></div>
+				<div><span class="small"><strong>Antiquity: </strong> {objetoTokenURL.ch}</span></div>
+				{#if (objetoTokenURL.r9 != '')}
+					<img src={objetoTokenURL.r9} class="card-img-top mb-3 imageBorder" alt={objetoTokenURL.name} width="100">
+				{/if}
+			</div>
+		</div>
+		</div>
+	</div>
+	{/if}
+
+	<!-- Audio -->
 	<div class="my-2 bg-light pb-1">
 		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
 			<i class="bi bi-music-note-list"></i>
@@ -331,6 +384,7 @@ listadosTimeLine ()
 		</div>
 	</div>
 
+	<!-- Imágenes -->
 	<div class="my-2 bg-light pb-1">
 		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
 			<i class="bi bi-images"></i>
@@ -343,16 +397,35 @@ listadosTimeLine ()
 				{#each arrayDatos as datos}
 					{#if datos.ext == '.png' || datos.ext == '.gif' || datos.ext == '.jpg' || datos.ext == 'jpeg' || datos.ext == '.bmp' || datos.ext == '.svg' || datos.ext == '.raf' || datos.ext == '.nef'}
 						<div class="card mt-2 mx-1 cardColor">
+							
 							<div>
 								{#if datos.class == true}
 									<button class="btn text-info" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>	
 								{:else}
 									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
 								{/if}
+								<a class="btn text-light" href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT%20created%20in%20@ergoplatformorg&url=https://ergonfts.org/%23/?token={datos.id}&hashtags=ErgoNFTs,NFTart,Ergo2Top10" target="_blank"><i class="bi bi-twitter"></i></a>
 							</div>
-							<a href={datos.r9} target="_blank" title={datos.name}>
+							<a href={datos.r9} title={datos.name} data-bs-toggle="modal" data-bs-target="#modalToken{datos.id}">
 								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
 							</a>
+							<!-- Modal -->
+							<div class="modal fade " id="modalToken{datos.id}" tabindex="-1" aria-labelledby="exampleModalLabelToken" aria-hidden="true">
+								<div class="modal-dialog modal-lg">
+								<div class="modal-content">
+									<div class="modal-header bg-secondary">
+									<h5 class="modal-title bg-dark text-light py-1 px-3" id="exampleModalLabelToken">ergonfts.org</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<div><span class="small"><strong>Token ID: </strong> {datos.id}</span></div>
+										<div><span class="small"><strong>Name: </strong> {datos.name}</span></div>
+										<div><span class="small"><strong>Antiquity: </strong> {datos.ch}</span></div>
+										<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="100">
+									</div>
+								</div>
+								</div>
+							</div>	
 						</div>
 					{/if}
 				{/each}
@@ -373,17 +446,35 @@ listadosTimeLine ()
 			{:then listadosTimeLine}
 				{#each arrayDatosTimeLine as datos}
 					{#if datos.ext == 'ink/' || datos.ext == '.png' || datos.ext == '.gif' || datos.ext == '.jpg' || datos.ext == 'jpeg' || datos.ext == '.bmp' || datos.ext == '.svg' || datos.ext == '.raf' || datos.ext == '.nef'}
-						<div class="card mt-2 mx-1 cardColor">
+					<div class="card mt-2 mx-1 cardColor">
 							<div>
 								{#if datos.class == true}
 									<button class="btn text-info" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>	
 								{:else}
 									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
 								{/if}
+								<a class="btn text-light" href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT%20created%20in%20@ergoplatformorg&url=https://ergonfts.org/%23/?token={datos.id}&hashtags=ErgoNFTs,NFTart,Ergo2Top10" target="_blank"><i class="bi bi-twitter"></i></a>
 							</div>
-							<a href={datos.r9} target="_blank" title={datos.name}>
+							<a href={datos.r9} title={datos.name} data-bs-toggle="modal" data-bs-target="#modalToken{datos.id}">
 								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
 							</a>
+							<!-- Modal -->
+							<div class="modal fade " id="modalToken{datos.id}" tabindex="-1" aria-labelledby="exampleModalLabelToken" aria-hidden="true">
+								<div class="modal-dialog modal-lg">
+								<div class="modal-content">
+									<div class="modal-header bg-secondary">
+									<h5 class="modal-title bg-dark text-light py-1 px-3" id="exampleModalLabelToken">ergonfts.org</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<div><span class="small"><strong>Token ID: </strong> {datos.id}</span></div>
+										<div><span class="small"><strong>Name: </strong> {datos.name}</span></div>
+										<div><span class="small"><strong>Antiquity: </strong> {datos.ch}</span></div>
+										<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="100">
+									</div>
+								</div>
+								</div>
+							</div>	
 							<span class="h6">{datos.name}</span><span class="small mb-2 text-secondary">{decodeURIComponent(escape(datos.description))}</span>
 							{#if (datos.urlInTxt !='')}
 								<hr class="text-secondary">
