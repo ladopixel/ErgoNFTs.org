@@ -63,13 +63,14 @@
 				<div class="modal-dialog modal-lg">
 				<div class="modal-content">
 					<div class="modal-header bg-secondary">
-						<span class="small text-light">{objetoTokenURL.name}</span>
+						<a href="https://ergonfts.org" class=" mx-3 separaI"><img src="Ergo-black.png" alt="Logotype Ergo" width="100"></a>
 						<button on:click|once={cerrarModal} type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
 						{#if (objetoTokenURL.r9 != '')}
 							<img src={objetoTokenURL.r9} class="card-img-top mb-3 imageBorder"  alt={objetoTokenURL.name} >
 						{/if}
+						<hr>
 						<div><span class="small"><strong>Token ID: </strong> {objetoTokenURL.id}</span></div>
 						<div><span class="small"><strong>Name: </strong> {objetoTokenURL.name}</span></div>
 						<div><span class="small"><strong>Antiquity: </strong> {objetoTokenURL.ch}</span></div>
