@@ -17,6 +17,9 @@
 	let objetoTimeLine = {}
 	let whale = ''
 
+	let metadata = ''
+	let objetoMetadata = {}
+
 	let offsetTokens = 0
 	let limitTokens = 20
 	let limitDisabled = false
@@ -204,32 +207,62 @@
             for(let i = 0; i < arrayIdsTimeLine.length; i++){
                 const res2 = await fetch(`https://api.ergoplatform.com/api/v0/assets/${arrayIdsTimeLine[i].id}/issuingBox`)
                 const data2 = await res2.json()
-				
 				let R7info = data2.map(token => token.additionalRegisters.R7)
 				if (R7info == '0e020101' || R7info == '0e020102' ){
 					let R9info = data2.map(token => token.additionalRegisters.R9)
 					let R5info = data2.map(token => token.additionalRegisters.R5)
-					if (R9info != '') {
-						linkify(arrayIdsTimeLine[i].description)
-						objetoTimeLine = {
-							id: data2.map(token => token.assets[0].tokenId),
-							name: data2.map(token => token.assets[0].name),
-							ch: data2.map(token => token.creationHeight),
-							description: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
-							r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
-							ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
-							urlInTxt: urlDescription
-						}
-					} else if ((R9info == '') && (arrayIdsTimeLine[i].description != '')) {
+					// Detectar si R5 viene con metadatos
+					metadata = data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(3))
+					if(isJson(metadata)){
+						// Si R5 SÍ trae metadatos.
+						if (R9info != '') {
 							linkify(arrayIdsTimeLine[i].description)
 							objetoTimeLine = {
 								id: data2.map(token => token.assets[0].tokenId),
 								name: data2.map(token => token.assets[0].name),
-								description: data2.map(token => toUtf8String(token.additionalRegisters.R5)),
-								r9: urlDescription,
-								ext: urlDescription.slice(-4),
+								ch: data2.map(token => token.creationHeight),
+								description: '',
+								r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+								ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 								urlInTxt: urlDescription
 							}
+						} else if ((R9info == '') && (arrayIdsTimeLine[i].description != '')) {
+								linkify(arrayIdsTimeLine[i].description)
+								objetoTimeLine = {
+									id: data2.map(token => token.assets[0].tokenId),
+									name: data2.map(token => token.assets[0].name),
+									description: '',
+									r9: urlDescription,
+									ext: urlDescription.slice(-4),
+									urlInTxt: urlDescription
+								}
+						}
+						objetoMetadata = JSON.parse(metadata)
+						visualizoMetadata(objetoMetadata)
+					} else {
+						// Si R5 NO trae metadatos.
+						if (R9info != '') {
+							linkify(arrayIdsTimeLine[i].description)
+							objetoTimeLine = {
+								id: data2.map(token => token.assets[0].tokenId),
+								name: data2.map(token => token.assets[0].name),
+								ch: data2.map(token => token.creationHeight),
+								description: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
+								r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+								ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
+								urlInTxt: urlDescription
+							}
+						} else if ((R9info == '') && (arrayIdsTimeLine[i].description != '')) {
+								linkify(arrayIdsTimeLine[i].description)
+								objetoTimeLine = {
+									id: data2.map(token => token.assets[0].tokenId),
+									name: data2.map(token => token.assets[0].name),
+									description: data2.map(token => toUtf8String(token.additionalRegisters.R5)),
+									r9: urlDescription,
+									ext: urlDescription.slice(-4),
+									urlInTxt: urlDescription
+								}
+						}
 					}
 				}
 				arrayDatosTimeLine[i] = objetoTimeLine
@@ -258,6 +291,33 @@ function linkify(text) {
     });
 }
 
+function isJson(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+function visualizoMetadata(obj){
+	for(var key in obj){
+		if(!obj.hasOwnProperty(key)) continue;
+			if(typeof obj[key] !== 'object') {
+				if(key == 'image'){
+					objetoTimeLine.description = objetoTimeLine.description + '<strong>' + letraMayuscula(key) + '</strong>: ' + '<a href="' + obj[key] + '">' + obj[key].substring(8, 30) + '...</a><br>'
+				}else if(!Array.isArray(obj)){
+					objetoTimeLine.description = objetoTimeLine.description + '<strong>' + letraMayuscula(key) + '</strong>: ' + obj[key] + '<br>'
+				}
+			} else {
+				visualizoMetadata(obj[key])
+			}
+			if (Array.isArray(obj[key])){
+                objetoTimeLine.description = objetoTimeLine.description + '<strong> ' + letraMayuscula(key) + ': </strong>' + obj[key] + '<br>'
+            }
+	}
+}
+
 
 if (JSON.stringify($location).substr(2)){
 	valorWallet = JSON.stringify($location).substr(2)
@@ -265,42 +325,13 @@ if (JSON.stringify($location).substr(2)){
 	listados()
 }
 
-// // Rescatar valor y mostrar token desde URL
-// valorIdToken = JSON.stringify($querystring)
-// if (valorIdToken.substring(1, 6) == 'token'){
-// 	valorIdToken = valorIdToken.substring(7, valorIdToken.length - 1);
-// 	muestraTokenURL (valorIdToken)
-// }
-
-// function muestraTokenURL(valorIdToken) {
-// 		fetch(`https://api.ergoplatform.com/api/v0/assets/${valorIdToken}/issuingBox`)
-//         	.then(response => response.json())
-//         	.then(consulta => {
-// 				objetoTokenURL = {
-// 					id: consulta.map(token => token.assets[0].tokenId),
-// 					name: consulta.map(token => token.assets[0].name),
-// 					ch: consulta.map(token => token.creationHeight),
-// 					r9: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
-// 					r5: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
-// 					ext: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
-// 				}
-// 			})
-// 			.catch(error => console.error(error));
-// }
+function letraMayuscula(texto) {
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
 
 
 listadosTimeLine ()
 </script>
-
-<!-- <svelte:head>
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-	<script src="popper.min.js"></script>
-	<script src="bootstrap.js"></script>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
-</svelte:head> -->
 
 <!-- Cabecera -->
 <main class=" bg-dark">
@@ -435,6 +466,8 @@ listadosTimeLine ()
 		</div>
 	</div>
 
+	<!-- Timeline -->
+
 	<div class="my-2 bg-light pb-1">
 		<div class="bg-secondary py-3 px-5 text-light border-bottom border-dark">
 			<i class="bi bi-wind"></i>
@@ -475,7 +508,7 @@ listadosTimeLine ()
 								</div>
 								</div>
 							</div>	
-							<span class="h6">{datos.name}</span><span class="small mb-2 text-secondary">{decodeURIComponent(escape(datos.description))}</span>
+							<span class="h6">{datos.name}</span><span class="small mb-2 text-secondary">{@html decodeURIComponent(escape(datos.description))}</span>
 							{#if (datos.urlInTxt !='')}
 								<hr class="text-secondary">
 								<span class="mb-3 text-dark"><i class="bi bi-link"></i>
