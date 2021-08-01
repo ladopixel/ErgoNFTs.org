@@ -6,6 +6,8 @@ Website to view information on nfts created on the Ergo blockchain.
 Ergonfts.org is used to list nfts:
 - Add unlimited wallets as favorites so you don't have to type them anymore.
 - Add favorite nfts from different wallets to create your favorites list.
+- All NFTs of an address >> https://ergonfts.org/#/yourAddress
+- Details of a specific NFT >> https://ergonfts.org/#/?token=tokenID
 
 (This website does not use cookies, all data is stored in your browser localstorage).
 
