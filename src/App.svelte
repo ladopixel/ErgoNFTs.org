@@ -7,6 +7,9 @@
 	let valorIdToken = ' '
 	let objetoTokenURL = {}
 
+	let metadata = ''
+	let objetoMetadata = {}
+
 	// Rescatar valor y mostrar token desde URL
 	valorIdToken = JSON.stringify($querystring)
 	if (valorIdToken.substring(1, 6) == 'token'){
@@ -18,16 +21,72 @@
 			fetch(`https://api.ergoplatform.com/api/v0/assets/${valorIdToken}/issuingBox`)
 				.then(response => response.json())
 				.then(consulta => {
-					objetoTokenURL = {
-						id: consulta.map(token => token.assets[0].tokenId),
-						name: consulta.map(token => token.assets[0].name),
-						ch: consulta.map(token => token.creationHeight),
-						r9: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
-						r5: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
-						ext: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
-					}
+
+					metadata = consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(3))
+
+					// Si trae metadata
+					if(isJson(metadata)){
+						objetoTokenURL = {
+							id: consulta.map(token => token.assets[0].tokenId),
+							name: consulta.map(token => token.assets[0].name),
+							ch: consulta.map(token => token.creationHeight),
+							description: '',
+							r8: consulta.map(token => token.additionalRegisters.R8),
+							r9: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+							r5: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
+							ext: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
+						}
+						objetoMetadata = JSON.parse(metadata)
+						visualizoMetadata(objetoMetadata)
+					
+					// No tiene metadata
+					} else {
+						objetoTokenURL = {
+							id: consulta.map(token => token.assets[0].tokenId),
+							name: consulta.map(token => token.assets[0].name),
+							ch: consulta.map(token => token.creationHeight),
+							description: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
+							r8: consulta.map(token => token.additionalRegisters.R8),
+							r9: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+							r5: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
+							ext: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
+						}
+					} 
+
+
 				})
 				.catch(error => console.error(error));
+	}
+
+	function isJson(str) {
+		try {
+			JSON.parse(str);
+		} catch (e) {
+			return false;
+		}
+		return true;
+	}
+
+	function visualizoMetadata(obj){
+		for(var key in obj){
+			if(!obj.hasOwnProperty(key)) continue;
+				if(typeof obj[key] !== 'object') {
+					if(key == 'image'){
+						objetoTokenURL.description = objetoTokenURL.description + '<strong>' + letraMayuscula(key) + '</strong>: ' + '<a href="' + obj[key] + '">' + obj[key].substring(8, 30) + '...</a><br>'
+					}else if(!Array.isArray(obj)){
+						objetoTokenURL.description = objetoTokenURL.description + '<strong>' + letraMayuscula(key) + '</strong>: ' + obj[key] + '<br>'
+					}
+				} else {
+					visualizoMetadata(obj[key])
+				}
+				if (Array.isArray(obj[key])){
+					objetoTokenURL.description = objetoTokenURL.description + '<strong> ' + letraMayuscula(key) + ': </strong>' + obj[key] + '<br>'
+				}
+		}
+	}
+
+	function letraMayuscula(texto) {
+		return texto.charAt(0).toUpperCase() + texto.slice(1);
 	}
 
 	function toUtf8String(hex) {
@@ -71,9 +130,22 @@
 							<img src={objetoTokenURL.r9} class="card-img-top mb-3 imageBorder"  alt={objetoTokenURL.name} >
 						{/if}
 						<hr>
-						<div><span class="small"><strong>Token ID: </strong> {objetoTokenURL.id}</span></div>
-						<div><span class="small"><strong>Name: </strong> {objetoTokenURL.name}</span></div>
-						<div><span class="small"><strong>Antiquity: </strong> {objetoTokenURL.ch}</span></div>
+						<div><span class="small text-break"><strong>Token ID: </strong><span class="text-secondary"> {objetoTokenURL.id}</span></span></div>
+						<div><span class="small text-break"><strong>Artwork Checksum: </strong><span class="text-secondary"> {objetoTokenURL.r8}</span></span></div>
+						<div><span class="small text-break"><strong>Name: </strong><span class="text-secondary"> {objetoTokenURL.name}</span></span></div>
+						<div><span class="small text-break"><strong>Antiquity: </strong> <span class="text-secondary">{objetoTokenURL.ch}</span></span></div>
+						<div class="accordion accordion-flush" id="accordionFlushExample">
+							<div class="accordion-item">
+							  <h2 class="accordion-header" id="flush-headingOne">
+								<button class="btn btn-sm border border-secondary text-wrap" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+								  Description
+								</button>
+							  </h2>
+							  <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+								<div class="accordion-body"><span class="small py-2 text-break"><br>{@html decodeURIComponent(objetoTokenURL.description)}</span></div>
+							  </div>
+							</div>
+						</div>
 					</div>
 				</div>
 				</div>
