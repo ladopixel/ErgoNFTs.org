@@ -31,7 +31,7 @@
 							name: consulta.map(token => token.assets[0].name),
 							ch: consulta.map(token => token.creationHeight),
 							description: '',
-							r8: consulta.map(token => token.additionalRegisters.R8),
+							r8: consulta.map(token => token.additionalRegisters.R8.substr(4)),
 							r9: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
 							r5: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 							ext: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
@@ -46,7 +46,7 @@
 							name: consulta.map(token => token.assets[0].name),
 							ch: consulta.map(token => token.creationHeight),
 							description: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
-							r8: consulta.map(token => token.additionalRegisters.R8),
+							r8: consulta.map(token => token.additionalRegisters.R8.substr(4)),
 							r9: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
 							r5: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 							ext: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
@@ -138,11 +138,11 @@
 							<div class="accordion-item">
 							  <h2 class="accordion-header" id="flush-headingOne">
 								<button class="btn btn-sm border border-secondary text-wrap" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-								  Description
+								  Description ℹ️
 								</button>
 							  </h2>
 							  <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-								<div class="accordion-body"><span class="small py-2 text-break"><br>{@html decodeURIComponent(objetoTokenURL.description)}</span></div>
+								<div class="accordion-body"><span class="small py-2 text-break">{@html decodeURIComponent(objetoTokenURL.description)}</span></div>
 							  </div>
 							</div>
 						</div>
