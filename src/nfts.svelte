@@ -160,7 +160,7 @@
 
 	const cleanLocalStorage = () => {
 		localStorage.clear()
-		location.reload()
+		window.location.href = 'https://ergonfts.org'
 	}
 
 	function toUtf8String(hex) {
