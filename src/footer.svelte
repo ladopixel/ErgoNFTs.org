@@ -13,6 +13,8 @@
 			<img src="Github.png" title="ergonfts.org Github " width="25" class="my-2 mx-2" alt="Logotype Github">Github
 		</a>
 		<button type="button" title="Donate :)" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalDonate"> <i class="bi bi-hand-thumbs-up-fill"></i></button>
+		<a href="https://instagram.com/ergonfts" target="_blank" title="Instagram ErgoNFTs" class="btn btn-dark text-light"><i class="bi bi-instagram"></i></a>
+		<a href="https://discord.gg/8KdWfpHNZR" target="_blank" title="Discord ErgoNFTs" class="btn btn-dark text-light"><i class="bi bi-discord"></i></a>
 	</small>
 </center>
 	<!-- Modal -->
