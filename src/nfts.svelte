@@ -222,6 +222,7 @@
 								name: data2.map(token => token.assets[0].name),
 								ch: data2.map(token => token.creationHeight),
 								description: '',
+								r8: data2.map(token => token.additionalRegisters.R8.substr(4)),
 								r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
 								ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 								urlInTxt: urlDescription
@@ -232,6 +233,7 @@
 									id: data2.map(token => token.assets[0].tokenId),
 									name: data2.map(token => token.assets[0].name),
 									description: '',
+									r8: data2.map(token => token.additionalRegisters.R8.substr(4)),
 									r9: urlDescription,
 									ext: urlDescription.slice(-4),
 									urlInTxt: urlDescription
@@ -248,6 +250,7 @@
 								name: data2.map(token => token.assets[0].name),
 								ch: data2.map(token => token.creationHeight),
 								description: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
+								r8: data2.map(token => token.additionalRegisters.R8.substr(4)),
 								r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
 								ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 								urlInTxt: urlDescription
@@ -258,6 +261,7 @@
 									id: data2.map(token => token.assets[0].tokenId),
 									name: data2.map(token => token.assets[0].name),
 									description: data2.map(token => toUtf8String(token.additionalRegisters.R5)),
+									r8: data2.map(token => token.additionalRegisters.R8.substr(4)),
 									r9: urlDescription,
 									ext: urlDescription.slice(-4),
 									urlInTxt: urlDescription
@@ -267,7 +271,7 @@
 				}
 				arrayDatosTimeLine[i] = objetoTimeLine
 				urlDescription = ''
-				objetoTimeLine = {id: '', name: '', description: '', r9: '', ext: '', urlInTxt: '' }
+				objetoTimeLine = {id: '', name: '', description: '', r8: '', r9: '', ext: '', urlInTxt: '' }
 			}
 			for(let j = 0; j < arrayDatosTimeLine.length; j++){
                 for (let k = 0; k < arrayFavorites.length; k++){
@@ -501,6 +505,7 @@ listadosTimeLine ()
 									</div>
 									<div class="modal-body">
 										<div><span class="small"><strong>Token ID: </strong> {datos.id}</span></div>
+										<div><span class="small"><strong>Artwork Checksum: </strong> {datos.r8}</span></div>
 										<div><span class="small"><strong>Name: </strong> {datos.name}</span></div>
 										<div><span class="small"><strong>Antiquity: </strong> {datos.ch}</span></div>
 										<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="100">
