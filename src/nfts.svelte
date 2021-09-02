@@ -115,6 +115,7 @@
 						id: data2.map(token => token.assets[0].tokenId),
 						name: data2.map(token => token.assets[0].name),
 						ch: data2.map(token => token.creationHeight),
+						r7: data2.map(token => token.additionalRegisters.R7),
 						r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
 						r5: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 						ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
@@ -399,7 +400,8 @@ listadosTimeLine ()
 				<p class="text-secondary">Loading...</p>
 			{:then listados}
 				{#each arrayDatos as datos}
-					{#if datos.ext == '.mp3' || datos.ext == '.ogg' || datos.ext == '.wma' || datos.ext == '.wav' || datos.ext == '.aac' || datos.ext == 'aiff'}
+					{#if datos.r7 == '0e020102'}
+					<!-- {#if datos.ext == '.mp3' || datos.ext == '.ogg' || datos.ext == '.wma' || datos.ext == '.wav' || datos.ext == '.aac' || datos.ext == 'aiff'} -->
 						<div class="card mt-2 mx-1 cardColor">
 							<div>
 								{#if datos.class == true}
@@ -513,7 +515,7 @@ listadosTimeLine ()
 								</div>
 								</div>
 							</div>	
-							<span class="h6">{datos.name}</span><span class="small mb-2 text-secondary">{@html decodeURIComponent(escape(datos.description))}</span>
+							<span class="h6">{datos.name}</span><span class="small mb-2 text-secondary">{@html decodeURIComponent( (datos.description))}</span>
 							{#if (datos.urlInTxt !='')}
 								<hr class="text-secondary">
 								<span class="mb-3 text-dark"><i class="bi bi-link"></i>
