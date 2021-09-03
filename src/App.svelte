@@ -31,6 +31,7 @@
 							name: consulta.map(token => token.assets[0].name),
 							ch: consulta.map(token => token.creationHeight),
 							description: '',
+							r7: consulta.map(token => token.additionalRegisters.R7),
 							r8: consulta.map(token => token.additionalRegisters.R8.substr(4)),
 							r9: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
 							r5: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
@@ -46,6 +47,7 @@
 							name: consulta.map(token => token.assets[0].name),
 							ch: consulta.map(token => token.creationHeight),
 							description: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
+							r7: consulta.map(token => token.additionalRegisters.R7),
 							r8: consulta.map(token => token.additionalRegisters.R8.substr(4)),
 							r9: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
 							r5: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
@@ -126,9 +128,15 @@
 						<button on:click|once={cerrarModal} type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
-						{#if (objetoTokenURL.r9 != '')}
-							<img src={objetoTokenURL.r9} class="card-img-top mb-3 imageBorder"  alt={objetoTokenURL.name} >
+
+						{#if (objetoTokenURL.r7) == '0e020101'}
+							{#if (objetoTokenURL.r9 != '')}
+								<img src={objetoTokenURL.r9} class="card-img-top mb-3 imageBorder"  alt={objetoTokenURL.name} >
+							{/if}
+						{:else if (objetoTokenURL.r7) == '0e020102'}
+							<audio src={objetoTokenURL.r9} class="card-img-top mb-3 " title={objetoTokenURL.name} controls></audio> 
 						{/if}
+						
 						<hr>
 						<div><span class="small text-break"><strong>Token ID: </strong><span class="text-secondary"> {objetoTokenURL.id}</span></span></div>
 						<div><span class="small text-break"><strong>Artwork Checksum: </strong><span class="text-secondary"> {objetoTokenURL.r8}</span></span></div>
