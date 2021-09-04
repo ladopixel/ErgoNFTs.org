@@ -111,14 +111,37 @@
 				for(let i = 0; i < arrayIds.length; i++){
 					const res2 = await fetch(`https://api.ergoplatform.com/api/v0/assets/${arrayIds[i]}/issuingBox`)
 					const data2 = await res2.json()
-					objeto = {
-						id: data2.map(token => token.assets[0].tokenId),
-						name: data2.map(token => token.assets[0].name),
-						ch: data2.map(token => token.creationHeight),
-						r7: data2.map(token => token.additionalRegisters.R7),
-						r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
-						r5: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
-						ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
+					
+					let R5info = data2.map(token => token.additionalRegisters.R5)
+					// Detectar si R5 viene con metadatos
+					metadata = data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(3))
+					if(isJson(metadata)){
+						objeto = {
+							id: data2.map(token => token.assets[0].tokenId),
+							name: data2.map(token => token.assets[0].name),
+							ch: data2.map(token => token.creationHeight),
+							description: '',
+							r7: data2.map(token => token.additionalRegisters.R7),
+							r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+							r5: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
+							ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
+						}
+
+						objetoMetadata = JSON.parse(metadata)
+						visualizoMetadataListado(objetoMetadata)
+					
+						// si no trae metadatos
+					} else{
+						objeto = {
+							id: data2.map(token => token.assets[0].tokenId),
+							name: data2.map(token => token.assets[0].name),
+							ch: data2.map(token => token.creationHeight),
+							description: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
+							r7: data2.map(token => token.additionalRegisters.R7),
+							r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+							r5: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
+							ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
+						}
 					}
 					arrayDatos[i] = objeto
 
@@ -323,6 +346,24 @@ function visualizoMetadata(obj){
 	}
 }
 
+function visualizoMetadataListado(obj){
+	for(var key in obj){
+		if(!obj.hasOwnProperty(key)) continue;
+			if(typeof obj[key] !== 'object') {
+				if(key == 'image'){
+					objeto.description = objeto.description + '<strong>' + letraMayuscula(key) + '</strong>: ' + '<a href="' + obj[key] + '">' + obj[key].substring(8, 30) + '...</a><br>'
+				}else if(!Array.isArray(obj)){
+					objeto.description = objeto.description + '<strong>' + letraMayuscula(key) + '</strong>: ' + obj[key] + '<br>'
+				}
+			} else {
+				visualizoMetadataListado(obj[key])
+			}
+			if (Array.isArray(obj[key])){
+                objeto.description = objeto.description + '<strong> ' + letraMayuscula(key) + ': </strong>' + obj[key] + '<br>'
+            }
+	}
+}
+
 
 if (JSON.stringify($location).substr(2)){
 	valorWallet = JSON.stringify($location).substr(2)
@@ -458,6 +499,18 @@ listadosTimeLine ()
 										<div><span class="small"><strong>Token ID: </strong> {datos.id}</span></div>
 										<div><span class="small"><strong>Name: </strong> {datos.name}</span></div>
 										<div><span class="small"><strong>Antiquity: </strong> {datos.ch}</span></div>
+										<div class="accordion accordion-flush" id="accordionFlushExample">
+											<div class="accordion-item">
+											  <h2 class="accordion-header" id="flush-headingOne">
+												<button class="btn btn-sm border border-secondary text-wrap" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+												  Metadata or description ℹ️
+												</button>
+											  </h2>
+											  <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+												<div class="accordion-body"><span class="small py-2 text-break">{@html decodeURIComponent( (datos.description))}</span></div>
+											  </div>
+											</div>
+										</div>
 										<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="100">
 									</div>
 								</div>
