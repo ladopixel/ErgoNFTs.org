@@ -482,7 +482,8 @@ listadosTimeLine ()
 								{:else}
 									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
 								{/if}
-								<a class="btn text-light" href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT%20created%20in%20@ergoplatformorg&url=https://ergonfts.org/%23/?token={datos.id}&hashtags=ErgoNFTs,NFTart,Ergo2Top10" target="_blank"><i class="bi bi-twitter"></i></a>
+								<a class="btn text-light" href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT%20created%20in%20@ergoplatformorg&url=https://ergonfts.org/%23/?token={datos.id}&hashtags=ErgoNFTs,NFTart,Ergo2Top10" target="_blank"><i class="bi bi-twitter"></i></a>								
+								<a class="btn text-light" href="https://www.google.com/searchbyimage?site=search&sa=X&image_url={datos.r9}" target="_blank"><i class="bi bi-binoculars-fill"></i></a>
 							</div>
 							<a href={datos.r9} title={datos.name} data-bs-toggle="modal" data-bs-target="#modalToken{datos.id}">
 								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
@@ -546,6 +547,7 @@ listadosTimeLine ()
 									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
 								{/if}
 								<a class="btn text-light" href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT%20created%20in%20@ergoplatformorg&url=https://ergonfts.org/%23/?token={datos.id}&hashtags=ErgoNFTs,NFTart,Ergo2Top10" target="_blank"><i class="bi bi-twitter"></i></a>
+								<a class="btn text-light" href="https://www.google.com/searchbyimage?site=search&sa=X&image_url={datos.r9}" target="_blank"><i class="bi bi-binoculars-fill"></i></a>
 							</div>
 							<a href={datos.r9} title={datos.name} data-bs-toggle="modal" data-bs-target="#modalToken{datos.id}">
 								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
