@@ -21,7 +21,7 @@
 	let objetoMetadata = {}
 
 	let offsetTokens = 0
-	let limitTokens = 20
+	let limitTokens = 50
 	let limitDisabled = false
 	let offsetDisabled = false
 
