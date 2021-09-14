@@ -21,7 +21,7 @@
 	let objetoMetadata = {}
 
 	let offsetTokens = 0
-	let limitTokens = 50
+	let limitTokens = 20
 	let limitDisabled = false
 	let offsetDisabled = false
 
@@ -122,7 +122,7 @@
 							ch: data2.map(token => token.creationHeight),
 							description: '',
 							r7: data2.map(token => token.additionalRegisters.R7),
-							r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+							r9: data2.map(token => resolveIpfs(toUtf8String(token.additionalRegisters.R9).substr(2))),
 							r5: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 							ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 						}
@@ -138,7 +138,7 @@
 							ch: data2.map(token => token.creationHeight),
 							description: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 							r7: data2.map(token => token.additionalRegisters.R7),
-							r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+							r9: data2.map(token => resolveIpfs(toUtf8String(token.additionalRegisters.R9).substr(2))),
 							r5: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 							ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 						}
@@ -171,7 +171,7 @@
 					id: data2.map(token => token.assets[0].tokenId),
 					name: data2.map(token => token.assets[0].name),
 					ch: data2.map(token => token.creationHeight),
-					r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+					r9: data2.map(token => resolveIpfs(toUtf8String(token.additionalRegisters.R9).substr(2))),
 					ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 					class: true
 				}
@@ -196,6 +196,12 @@
 			str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
 		}
 		return str;
+	}
+
+	function resolveIpfs(url) {
+		const ipfsPrefix = 'ipfs://'
+		if (!url.startsWith(ipfsPrefix)) return url
+		else return url.replace(ipfsPrefix, 'https://cloudflare-ipfs.com/ipfs/')
 	}
 
 	const sumaOffset = () => {
@@ -246,8 +252,9 @@
 								name: data2.map(token => token.assets[0].name),
 								ch: data2.map(token => token.creationHeight),
 								description: '',
+								r7: data2.map(token => token.additionalRegisters.R7),
 								r8: data2.map(token => token.additionalRegisters.R8.substr(4)),
-								r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+								r9: data2.map(token => resolveIpfs(toUtf8String(token.additionalRegisters.R9).substr(2))),
 								ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 								urlInTxt: urlDescription
 							}
@@ -257,6 +264,7 @@
 									id: data2.map(token => token.assets[0].tokenId),
 									name: data2.map(token => token.assets[0].name),
 									description: '',
+									r7: data2.map(token => token.additionalRegisters.R7),
 									r8: data2.map(token => token.additionalRegisters.R8.substr(4)),
 									r9: urlDescription,
 									ext: urlDescription.slice(-4),
@@ -274,8 +282,9 @@
 								name: data2.map(token => token.assets[0].name),
 								ch: data2.map(token => token.creationHeight),
 								description: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
+								r7: data2.map(token => token.additionalRegisters.R7),
 								r8: data2.map(token => token.additionalRegisters.R8.substr(4)),
-								r9: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+								r9: data2.map(token => resolveIpfs(toUtf8String(token.additionalRegisters.R9).substr(2))),
 								ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 								urlInTxt: urlDescription
 							}
@@ -285,6 +294,7 @@
 									id: data2.map(token => token.assets[0].tokenId),
 									name: data2.map(token => token.assets[0].name),
 									description: data2.map(token => toUtf8String(token.additionalRegisters.R5)),
+									r7: data2.map(token => token.additionalRegisters.R7),
 									r8: data2.map(token => token.additionalRegisters.R8.substr(4)),
 									r9: urlDescription,
 									ext: urlDescription.slice(-4),
@@ -295,7 +305,7 @@
 				}
 				arrayDatosTimeLine[i] = objetoTimeLine
 				urlDescription = ''
-				objetoTimeLine = {id: '', name: '', description: '', r8: '', r9: '', ext: '', urlInTxt: '' }
+				objetoTimeLine = {id: '', name: '', description: '', r7: '', r8: '', r9: '', ext: '', urlInTxt: '' }
 			}
 			for(let j = 0; j < arrayDatosTimeLine.length; j++){
                 for (let k = 0; k < arrayFavorites.length; k++){
@@ -473,9 +483,9 @@ listadosTimeLine ()
 				<p class="text-secondary">Loading...</p>
 			{:then listados}
 				{#each arrayDatos as datos}
-					{#if datos.ext == '.png' || datos.ext == '.gif' || datos.ext == '.jpg' || datos.ext == 'jpeg' || datos.ext == '.bmp' || datos.ext == '.svg' || datos.ext == '.raf' || datos.ext == '.nef'}
+					{#if datos.r7 == '0e020101'}
+					<!-- {#if datos.ext == '.png' || datos.ext == '.gif' || datos.ext == '.jpg' || datos.ext == 'jpeg' || datos.ext == '.bmp' || datos.ext == '.svg' || datos.ext == '.raf' || datos.ext == '.nef'} -->
 						<div class="card mt-2 mx-1 cardColor">
-							
 							<div>
 								{#if datos.class == true}
 									<button class="btn text-info" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>	
@@ -538,7 +548,8 @@ listadosTimeLine ()
 				<p class="text-secondary">Loading...</p>
 			{:then listadosTimeLine}
 				{#each arrayDatosTimeLine as datos}
-					{#if datos.ext == 'ink/' || datos.ext == '.png' || datos.ext == '.gif' || datos.ext == '.jpg' || datos.ext == 'jpeg' || datos.ext == '.bmp' || datos.ext == '.svg' || datos.ext == '.raf' || datos.ext == '.nef'}
+					{#if datos.r7 == '0e020101'}
+					<!-- {#if datos.ext == 'ink/' || datos.ext == '.png' || datos.ext == '.gif' || datos.ext == '.jpg' || datos.ext == 'jpeg' || datos.ext == '.bmp' || datos.ext == '.svg' || datos.ext == '.raf' || datos.ext == '.nef'} -->
 					<div class="card mt-2 mx-1 cardColor">
 							<div>
 								{#if datos.class == true}
