@@ -171,7 +171,10 @@
 					id: data2.map(token => token.assets[0].tokenId),
 					name: data2.map(token => token.assets[0].name),
 					ch: data2.map(token => token.creationHeight),
+					description: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
+					r7: data2.map(token => token.additionalRegisters.R7),
 					r9: data2.map(token => resolveIpfs(toUtf8String(token.additionalRegisters.R9).substr(2))),
+					r5: data2.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 					ext: data2.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4)),
 					class: true
 				}
