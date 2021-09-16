@@ -33,7 +33,7 @@
 							description: '',
 							r7: consulta.map(token => token.additionalRegisters.R7),
 							r8: consulta.map(token => token.additionalRegisters.R8.substr(4)),
-							r9: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+							r9: consulta.map(token => resolveIpfs(toUtf8String(token.additionalRegisters.R9).substr(2))),
 							r5: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 							ext: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
 						}
@@ -49,7 +49,7 @@
 							description: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 							r7: consulta.map(token => token.additionalRegisters.R7),
 							r8: consulta.map(token => token.additionalRegisters.R8.substr(4)),
-							r9: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2)),
+							r9: consulta.map(token => resolveIpfs(toUtf8String(token.additionalRegisters.R9).substr(2))),
 							r5: consulta.map(token => toUtf8String(token.additionalRegisters.R5).substr(2)),
 							ext: consulta.map(token => toUtf8String(token.additionalRegisters.R9).substr(2).slice(-4))
 						}
@@ -89,6 +89,12 @@
 
 	function letraMayuscula(texto) {
 		return texto.charAt(0).toUpperCase() + texto.slice(1);
+	}
+
+	function resolveIpfs(url) {
+		const ipfsPrefix = 'ipfs://'
+		if (!url.startsWith(ipfsPrefix)) return url
+		else return url.replace(ipfsPrefix, 'https://cloudflare-ipfs.com/ipfs/')
 	}
 
 	function toUtf8String(hex) {
