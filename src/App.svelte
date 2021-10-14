@@ -160,6 +160,7 @@
 							  </div>
 							</div>
 						</div>
+						<div><a class="btn btn-sm text-secondary border border-info my-1" href="https://ergotokens.org/#/?token={objetoTokenURL.id}" title="Details in ErgoTokens.org">Details in ErgoTokens.org</a></div>
 					</div>
 				</div>
 				</div>
