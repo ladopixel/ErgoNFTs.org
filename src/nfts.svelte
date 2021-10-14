@@ -463,6 +463,8 @@ listadosTimeLine ()
 								{:else}
 									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
 								{/if}
+								<a class="btn text-light" href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT&url=https://ergonfts.org/%23/?token={datos.id}%20created%20in%20@ergoplatformorg%20♥&hashtags=ErgoNFT" target="_blank"><i class="bi bi-twitter"></i></a>
+								<a class="btn text-light" href="https://ergotokens.org/#/?token={datos.id}" title="Details in ErgoTokens.org"><i class="bi bi-card-text"></i></a>
 								{datos.name}
 							</div>
 							<audio src={datos.r9} class="card-img-top mb-3 " title={datos.name} controls></audio> 
@@ -495,8 +497,9 @@ listadosTimeLine ()
 								{:else}
 									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
 								{/if}
-								<a class="btn text-light" href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT%20created%20in%20@ergoplatformorg&url=https://ergonfts.org/%23/?token={datos.id}&hashtags=ErgoNFTs,NFTart,Ergo2Top10" target="_blank"><i class="bi bi-twitter"></i></a>								
+								<a class="btn text-light" href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT&url=https://ergonfts.org/%23/?token={datos.id}%20created%20in%20@ergoplatformorg%20♥&hashtags=ErgoNFT" target="_blank"><i class="bi bi-twitter"></i></a>
 								<a class="btn text-light" href="https://www.google.com/searchbyimage?site=search&sa=X&image_url={datos.r9}" target="_blank"><i class="bi bi-binoculars-fill"></i></a>
+								<a class="btn text-light" href="https://ergotokens.org/#/?token={datos.id}" title="Details in ErgoTokens.org"><i class="bi bi-card-text"></i></a>
 							</div>
 							<a href={datos.r9} title={datos.name} data-bs-toggle="modal" data-bs-target="#modalToken{datos.id}">
 								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
@@ -560,8 +563,9 @@ listadosTimeLine ()
 								{:else}
 									<button class="btn text-light" on:click={addFavorite(datos.id)}><i class="bi bi-heart-fill " title="Add favorite"></i></button>
 								{/if}
-								<a class="btn text-light" href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT%20created%20in%20@ergoplatformorg&url=https://ergonfts.org/%23/?token={datos.id}&hashtags=ErgoNFT" target="_blank"><i class="bi bi-twitter"></i></a>
+								<a class="btn text-light" href="https://twitter.com/intent/tweet?text=Enjoy%20this%20NFT&url=https://ergonfts.org/%23/?token={datos.id}%20created%20in%20@ergoplatformorg%20♥&hashtags=ErgoNFT" target="_blank"><i class="bi bi-twitter"></i></a>
 								<a class="btn text-light" href="https://www.google.com/searchbyimage?site=search&sa=X&image_url={datos.r9}" target="_blank"><i class="bi bi-binoculars-fill"></i></a>
+								<a class="btn text-light" href="https://ergotokens.org/#/?token={datos.id}" title="Details in ErgoTokens.org"><i class="bi bi-card-text"></i></a>
 							</div>
 							<a href={datos.r9} title={datos.name} data-bs-toggle="modal" data-bs-target="#modalToken{datos.id}">
 								<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="200">
@@ -579,6 +583,7 @@ listadosTimeLine ()
 										<div><span class="small"><strong>Artwork Checksum: </strong> {datos.r8}</span></div>
 										<div><span class="small"><strong>Name: </strong> {datos.name}</span></div>
 										<div><span class="small"><strong>Antiquity: </strong> {datos.ch}</span></div>
+										<a class="btn btn-sm text-secondary border border-info my-1" href="https://ergotokens.org/#/?token={datos.id}" title="Details in ErgoTokens.org">Details in ErgoTokens.org</a>
 										<img src={datos.r9} class="card-img-top mb-3 imageBorder" alt={datos.name} width="100">
 									</div>
 								</div>
